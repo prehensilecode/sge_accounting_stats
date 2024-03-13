@@ -39,5 +39,6 @@ ax.set_xlabel('Wait time (s)')
 ax.set_ylabel('Frequency')
 fig.tight_layout()
 plt.savefig('wait_time.pdf')
+plt.savefig('wait_time.png')
 
 print(cubic_df.groupby(cubic_df['submission_time'].dt.month)['wait_time'])
