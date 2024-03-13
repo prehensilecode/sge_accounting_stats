@@ -38,6 +38,6 @@ ax.set_title('Histogram of wait time for CUBIC (Jan 01, 2023 - present)')
 ax.set_xlabel('Wait time (s)')
 ax.set_ylabel('Frequency')
 fig.tight_layout()
-plt.savefig('wait_time.svg')
+plt.savefig('wait_time.pdf')
 
 print(cubic_df.groupby(cubic_df['submission_time'].dt.month)['wait_time'])
