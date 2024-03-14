@@ -3,6 +3,8 @@ import sys, os, datetime
 import pandas as pd
 import matplotlib
 
+# these column names are documented in the accounting(5) man page
+# N.B. if you are using Univa Grid Engine, this set of names changes between versions
 colnames=['qname', 'hostname', 'group', 'owner', 'job_name', 'job_number', 'account', 'priority', 'submission_time', 'start_time', 'end_time', 'failed', 'exit_status', 'ru_wallclock', 'ru_utime', 'ru_stime', 'ru_maxrss', 'ru_ixrss', 'ru_ismrss', 'ru_idrss', 'ru_isrss', 'ru_minflt', 'ru_majflt', 'ru_nswap', 'ru_inblock', 'ru_oublock', 'ru_msgsnd', 'ru_msgrcv', 'ru_nsignals', 'ru_nvcsw', 'ru_nivcsw', 'project', 'department', 'granted_pe', 'slots', 'task_number', 'cpu', 'mem', 'io', 'category', 'iow', 'pe_taskid', 'maxvmem', 'arid', 'ar_sub_time']
 
 cubic_df = pd.read_csv('accounting', sep=':', names=colnames)
