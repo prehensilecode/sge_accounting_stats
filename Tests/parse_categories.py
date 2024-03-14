@@ -3,7 +3,7 @@ import sys, os
 import csv
 import re
 
-res_pat = re.compile(r'.*-l\ (\S+)\ ')
+res_pat = re.compile(r'.*-l\ (\S+)\ .*')
 
 with open('categories.csv') as csvfile:
     cat_reader = csv.reader(csvfile, delimiter=':')
