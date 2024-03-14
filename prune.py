@@ -16,7 +16,8 @@ cubic_df = cubic_df[cubic_df['submission_time'] > 1672549200]
 #cubic_df = cubic_df[cubic_df['submission_time'] < 1704085200]
 
 # selective
-wanted_cols = ['qname', 'hostname', 'owner', 'job_number', 'submission_time', 'start_time', 'end_time', 'failed', 'exit_status', 'ru_wallclock', 'ru_utime', 'slots', 'cpu', 'mem', 'io', 'iow', 'maxvmem']
+# category includes the qsub commandline, including various complex requests
+wanted_cols = ['qname', 'hostname', 'owner', 'job_number', 'submission_time', 'start_time', 'end_time', 'failed', 'exit_status', 'ru_wallclock', 'ru_utime', 'slots', 'cpu', 'mem', 'io', 'category', 'iow', 'maxvmem']
 
 cubic_df.to_csv('accounting_shorter', columns=wanted_cols, sep=':', index=False)
 
