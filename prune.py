@@ -2,6 +2,7 @@
 import sys, os, datetime
 import pandas as pd
 import matplotlib
+import time
 
 # these column names are documented in the accounting(5) man page
 # N.B. if you are using Univa Grid Engine, this set of names changes between versions
@@ -10,10 +11,12 @@ colnames=['qname', 'hostname', 'group', 'owner', 'job_name', 'job_number', 'acco
 cubic_df = pd.read_csv('accounting', sep=':', names=colnames)
 
 # keep all rows that occurred after 2023-01-01 00:00:00 = timestamp 1672549200
-cubic_df = cubic_df[cubic_df['submission_time'] > 1672549200]
+timestamp = time.mktime(time.strptime('2023-01-01 00:00:00', '%Y-%m-%d %H:%M:%S'))
+cubic_df = cubic_df[cubic_df['submission_time'] > timestamp]
 
 # keep all rows that ocurred before 2024-01-01 00:00:00 = timestamp 1704085200
-#cubic_df = cubic_df[cubic_df['submission_time'] < 1704085200]
+#timestamp = time.mktime(time.strptime('2024-01-01 00:00:00', '%Y-%m-%d %H:%M:%S'))
+#cubic_df = cubic_df[cubic_df['submission_time'] < timestamp]
 
 # selective
 # category includes the qsub commandline, including various complex requests
