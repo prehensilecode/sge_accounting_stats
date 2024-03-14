@@ -29,7 +29,8 @@ print(f"Max wait time = {cubic_df['wait_time'].max()}")
 
 fig, ax = plt.subplots()
 
-n, bins, patchs = plt.hist(cubic_df['wait_time'].dt.total_seconds(), bins=100, log=True)
+n, bins, patchs = plt.hist(cubic_df['wait_time'].dt.total_seconds(), bins=100,
+                           log=False)
 
 # add vertical line at the mean
 print(f"median at {float(cubic_df['wait_time'].dt.total_seconds().median()) / float(cubic_df['wait_time'].dt.total_seconds().max())}")
