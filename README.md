@@ -17,10 +17,10 @@ sbatch prune.sh
 ### Run analysis
 Either directly:
 ```
-./cubicstats.py
+./sgestats.py
 ```
 
 or submit to cluster:
 ```
-sbatch cubicstats.sh
+sbatch sgestats.sh
 ```
