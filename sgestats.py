@@ -183,8 +183,8 @@ def main():
     # XXX the datetime and timedelta fields are human-readable, and so do not 
     # get converted to appropriate Pandas datatypes when read-in again
     # JSON handles this OK by date_format='epoch'
-    #sgeacct_df.to_json('accounting_postprocessed.json', date_format='epoch')
-    sgeacct_df.to_csv('accounting_postprocessed', sep=':', index=False)
+    #sgeacct_df.to_csv('accounting_postprocessed', sep=':', index=False)
+    sgeacct_df.to_json('accounting_postprocessed.json', date_format='epoch')
 
     if debug_p:
         print(f"DEBUG: sgeacct_df.head() = \n{sgeacct_df.head()}")
@@ -229,6 +229,7 @@ def main():
         print(nongpujobs_df.describe())
         print(nongpujobs_df.head())
 
+    print(f"No. of jobs not requesting GPUs: {len(nongpujobs_df.index)}")
     print(f"Median wait time = {nongpujobs_df['wait_time'].median()}")
     print(f"Mean wait time = {nongpujobs_df['wait_time'].mean()}")
     print(f"Min wait time = {nongpujobs_df['wait_time'].min()}")
@@ -247,6 +248,7 @@ def main():
 
     print("Wait time for jobs requesting any GPU")
     gpujobs_df = sgeacct_df[sgeacct_df['gpu'] > 0]
+    print(f"No. of jobs requesting GPUs of any type: {len(gpujobs_df.index)}")
     print(f"Median wait time = {gpujobs_df['wait_time'].median()}")
     print(f"Mean wait time = {gpujobs_df['wait_time'].mean()}")
     print(f"Min wait time = {gpujobs_df['wait_time'].min()}")
@@ -266,6 +268,7 @@ def main():
 
     print("Wait time for jobs requesting A100 GPU")
     gpua100jobs_df = sgeacct_df[(sgeacct_df['gpu'] > 0) & (sgeacct_df['gpu_type'] == 'a100')]
+    print(f"No. of jobs requesting A100 GPUs: {len(gpua100jobs_df.index)}")
     print(f"Median wait time = {gpua100jobs_df['wait_time'].median()}")
     print(f"Mean wait time = {gpua100jobs_df['wait_time'].mean()}")
     print(f"Min wait time = {gpua100jobs_df['wait_time'].min()}")
