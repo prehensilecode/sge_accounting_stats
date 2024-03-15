@@ -5,5 +5,9 @@
 #SBATCH --output=sgestats-%j.out
 
 source ~/Venvs/general/bin/activate
+cp -f accounting* $TMP
+cp sgestats.py $TMP
+cd $TMP
 ./sgestats.py
+cp -f accounting_postprocessed $SLURM_SUBMIT_DIR
 
