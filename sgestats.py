@@ -67,7 +67,9 @@ def parse_categories(cat):
             retkey = key.lower()
             retval = memstr_to_mebibyte(val)
         elif key.lower() == 'hostname':
-            retkey = key.lower()
+            # the accounting data already has a column "hostname" which is
+            # the host allocated to the job
+            retkey = 'requested_hostnames'
             retval = val
         elif key.lower() == 'h_rt':
             retkey = key.lower()
@@ -113,8 +115,8 @@ def parse_categories(cat):
     if 'tmpfree' not in retdict:
         retdict['tmpfree'] = None
 
-    if 'hostname' not in retdict:
-        retdict['hostname'] = None
+    if 'requested_hostnames' not in retdict:
+        retdict['requested_hostnames'] = None
 
     if 'sgx' not in retdict:
         retdict['sgx'] = False
@@ -181,6 +183,7 @@ def main():
     # XXX the datetime and timedelta fields are human-readable, and so do not 
     # get converted to appropriate Pandas datatypes when read-in again
     # JSON handles this OK by date_format='epoch'
+    #sgeacct_df.to_json('accounting_postprocessed.json', date_format='epoch')
     sgeacct_df.to_csv('accounting_postprocessed', sep=':', index=False)
 
     if debug_p:

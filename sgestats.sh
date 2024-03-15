@@ -9,5 +9,5 @@ cp -f accounting* $TMP
 cp sgestats.py $TMP
 cd $TMP
 ./sgestats.py
-cp -f accounting_postprocessed $SLURM_SUBMIT_DIR
+cp -f accounting_postprocessed* $SLURM_SUBMIT_DIR
 
