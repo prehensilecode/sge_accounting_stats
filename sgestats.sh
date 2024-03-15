@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --ntasks-per-node=8
-#SBATCH --mem=180G
+#SBATCH --mem=32G
 #SBATCH --time=0:30:00
 #SBATCH --output=sgestats-%j.out
 
