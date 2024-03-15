@@ -163,25 +163,25 @@ def main():
     pd.set_option('display.max_columns', None)
     pd.set_option('display.max_rows', None)
 
-    # read in post-processed data, or pre-filtered data
-    if Path('accounting_postprocessed').exists():
-        sgeacct_df = pd.read_csv('accounting_postprocessed', sep=':')
-    else:
-        sgeacct_df = pd.read_csv('accounting_shorter', sep=':')
+    # read in pre-filtered data
+    sgeacct_df = pd.read_csv('accounting_shorter', sep=':')
 
-        # drop all rows where start_time is earlier than submission_time
-        bad_rows = sgeacct_df[sgeacct_df['start_time'] < sgeacct_df['submission_time']].index
-        sgeacct_df.drop(bad_rows, inplace=True)
+    # drop all rows where start_time is earlier than submission_time
+    bad_rows = sgeacct_df[sgeacct_df['start_time'] < sgeacct_df['submission_time']].index
+    sgeacct_df.drop(bad_rows, inplace=True)
 
-        sgeacct_df['submission_time'] = pd.to_datetime(sgeacct_df['submission_time'], unit='s')
-        sgeacct_df['start_time'] = pd.to_datetime(sgeacct_df['start_time'], unit='s')
-        sgeacct_df['end_time'] = pd.to_datetime(sgeacct_df['end_time'], unit='s')
+    sgeacct_df['submission_time'] = pd.to_datetime(sgeacct_df['submission_time'], unit='s')
+    sgeacct_df['start_time'] = pd.to_datetime(sgeacct_df['start_time'], unit='s')
+    sgeacct_df['end_time'] = pd.to_datetime(sgeacct_df['end_time'], unit='s')
 
-        sgeacct_df['wait_time'] = (sgeacct_df['start_time'] - sgeacct_df['submission_time'])
+    sgeacct_df['wait_time'] = (sgeacct_df['start_time'] - sgeacct_df['submission_time'])
 
-        sgeacct_df = prep_accounting(sgeacct_df)
+    sgeacct_df = prep_accounting(sgeacct_df)
 
-        sgeacct_df.to_csv('accounting_postprocessed', sep=':', index=False)
+    # XXX the datetime and timedelta fields are human-readable, and so do not 
+    # get converted to appropriate Pandas datatypes when read-in again
+    # JSON handles this OK by date_format='epoch'
+    sgeacct_df.to_csv('accounting_postprocessed', sep=':', index=False)
 
     if debug_p:
         print(f"DEBUG: sgeacct_df.head() = \n{sgeacct_df.head()}")
@@ -261,6 +261,24 @@ def main():
     plt.savefig('wait_time_gpu.png')
     print()
 
+    print("Wait time for jobs requesting A100 GPU")
+    gpua100jobs_df = sgeacct_df[(sgeacct_df['gpu'] > 0) & (sgeacct_df['gpu_type'] == 'a100')]
+    print(f"Median wait time = {gpua100jobs_df['wait_time'].median()}")
+    print(f"Mean wait time = {gpua100jobs_df['wait_time'].mean()}")
+    print(f"Min wait time = {gpua100jobs_df['wait_time'].min()}")
+    print(f"Max wait time = {gpua100jobs_df['wait_time'].max()}")
+    print()
+
+    fig, ax = plt.subplots()
+    n, bins, patchs = plt.hist(gpua100jobs_df['wait_time'].dt.total_seconds(), bins=100,
+                               log=False)
+    ax.set_title('Histogram of wait time for CUBIC A100 GPU jobs (Jan 01, 2023 - present)')
+    ax.set_xlabel('Wait time (s)')
+    ax.set_ylabel('Frequency')
+    fig.tight_layout()
+    plt.savefig('wait_time_gpu.pdf')
+    plt.savefig('wait_time_gpu.png')
+    print()
 
 if __name__ == '__main__':
     main()
