@@ -160,6 +160,7 @@ cython_debug/
 #.idea/
 
 *.csv
+*.json
 accounting
 accounting_shorter
 accounting_postprocessed
