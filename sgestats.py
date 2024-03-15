@@ -180,12 +180,6 @@ def main():
 
     sgeacct_df = prep_accounting(sgeacct_df)
 
-    # XXX the datetime and timedelta fields are human-readable, and so do not 
-    # get converted to appropriate Pandas datatypes when read-in again
-    # JSON handles this OK by date_format='epoch'
-    #sgeacct_df.to_csv('accounting_postprocessed', sep=':', index=False)
-    sgeacct_df.to_json('accounting_postprocessed.json', date_format='epoch')
-
     if debug_p:
         print(f"DEBUG: sgeacct_df.head() = \n{sgeacct_df.head()}")
         print()
@@ -195,8 +189,10 @@ def main():
 
     print(f"Min submission_time = {sgeacct_df['submission_time'].min()} ; Min start_time = {sgeacct_df['start_time'].min()}")
     print(f"Max submission_time = {sgeacct_df['submission_time'].max()} ; Max start_time = {sgeacct_df['start_time'].max()}")
+    print()
 
     print(f"Stats for CUBIC from {sgeacct_df['submission_time'].iloc[0]} - {sgeacct_df['end_time'].iloc[-1]}")
+    print(f"No. of jobs: {len(sgeacct_df.index):.4e}")
     print(f"Median wait time = {sgeacct_df['wait_time'].median()}")
     print(f"Mean wait time = {sgeacct_df['wait_time'].mean()}")
     print(f"Min wait time = {sgeacct_df['wait_time'].min()}")
@@ -229,7 +225,7 @@ def main():
         print(nongpujobs_df.describe())
         print(nongpujobs_df.head())
 
-    print(f"No. of jobs not requesting GPUs: {len(nongpujobs_df.index)}")
+    print(f"No. of jobs not requesting GPUs: {len(nongpujobs_df.index):.4e}")
     print(f"Median wait time = {nongpujobs_df['wait_time'].median()}")
     print(f"Mean wait time = {nongpujobs_df['wait_time'].mean()}")
     print(f"Min wait time = {nongpujobs_df['wait_time'].min()}")
@@ -248,7 +244,7 @@ def main():
 
     print("Wait time for jobs requesting any GPU")
     gpujobs_df = sgeacct_df[sgeacct_df['gpu'] > 0]
-    print(f"No. of jobs requesting GPUs of any type: {len(gpujobs_df.index)}")
+    print(f"No. of jobs requesting GPUs of any type: {len(gpujobs_df.index):.4e}")
     print(f"Median wait time = {gpujobs_df['wait_time'].median()}")
     print(f"Mean wait time = {gpujobs_df['wait_time'].mean()}")
     print(f"Min wait time = {gpujobs_df['wait_time'].min()}")
@@ -268,7 +264,7 @@ def main():
 
     print("Wait time for jobs requesting A100 GPU")
     gpua100jobs_df = sgeacct_df[(sgeacct_df['gpu'] > 0) & (sgeacct_df['gpu_type'] == 'a100')]
-    print(f"No. of jobs requesting A100 GPUs: {len(gpua100jobs_df.index)}")
+    print(f"No. of jobs requesting A100 GPUs: {len(gpua100jobs_df.index):.4e}")
     print(f"Median wait time = {gpua100jobs_df['wait_time'].median()}")
     print(f"Mean wait time = {gpua100jobs_df['wait_time'].mean()}")
     print(f"Min wait time = {gpua100jobs_df['wait_time'].min()}")
@@ -285,6 +281,27 @@ def main():
     plt.savefig('wait_time_gpu.pdf')
     plt.savefig('wait_time_gpu.png')
     print()
+
+    print("Wait time for jobs requesting V100 GPU")
+    gpuv100jobs_df = sgeacct_df[(sgeacct_df['gpu'] > 0) & (sgeacct_df['gpu_type'] == 'v100')]
+    print(f"No. of jobs requesting V100 GPUs: {len(gpuv100jobs_df.index):.4e}")
+    print(f"Median wait time = {gpuv100jobs_df['wait_time'].median()}")
+    print(f"Mean wait time = {gpuv100jobs_df['wait_time'].mean()}")
+    print(f"Min wait time = {gpuv100jobs_df['wait_time'].min()}")
+    print(f"Max wait time = {gpuv100jobs_df['wait_time'].max()}")
+    print()
+
+    fig, ax = plt.subplots()
+    n, bins, patchs = plt.hist(gpuv100jobs_df['wait_time'].dt.total_seconds(), bins=100,
+                               log=False)
+    ax.set_title('Histogram of wait time for CUBIC V100 GPU jobs (Jan 01, 2023 - present)')
+    ax.set_xlabel('Wait time (s)')
+    ax.set_ylabel('Frequency')
+    fig.tight_layout()
+    plt.savefig('wait_time_gpu.pdf')
+    plt.savefig('wait_time_gpu.png')
+    print()
+
 
 if __name__ == '__main__':
     main()
