@@ -162,6 +162,7 @@ cython_debug/
 *.csv
 accounting
 accounting_shorter
+accounting_postprocessed
 *.pdf
 *.png
 
