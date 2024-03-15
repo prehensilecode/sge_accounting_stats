@@ -180,6 +180,9 @@ def main():
 
     sgeacct_df = prep_accounting(sgeacct_df)
 
+    # this is for debugging
+    sgeacct_df.to_csv('accounting_postprocessed.csv', sep=':', index=False)
+
     if debug_p:
         print(f"DEBUG: sgeacct_df.head() = \n{sgeacct_df.head()}")
         print()
