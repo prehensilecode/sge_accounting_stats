@@ -14,4 +14,4 @@ cp sgestats.py $TMP
 cd $TMP
 ./sgestats.py
 cp accounting_postprocessed* $SLURM_SUBMIT_DIR
-cp *.png *.pdf $SLURM_SUBMIT_DIR
+cp *.png *.pdf *.html $SLURM_SUBMIT_DIR

@@ -214,6 +214,9 @@ def main():
     print(f"Max wait time = {sgeacct_df['wait_time'].max()}")
     print()
 
+    wait_by_resource = []
+    wait_by_resource.append({'resource': 'Any', 'median_wait_time': sgeacct_df['wait_time'].median()})
+
     fig, ax = plt.subplots()
 
     n, bins, patchs = plt.hist(sgeacct_df['wait_time'].dt.total_seconds(), bins=100,
@@ -233,7 +236,6 @@ def main():
     plt.clf()
     print()
 
-
     print("Wait time for non-GPU jobs")
     nongpujobs_df = sgeacct_df[sgeacct_df['gpu'] == 0]
 
@@ -245,6 +247,8 @@ def main():
     print(f"Median wait time = {nongpujobs_df['wait_time'].median()}")
     print(f"Min wait time = {nongpujobs_df['wait_time'].min()}")
     print(f"Max wait time = {nongpujobs_df['wait_time'].max()}")
+
+    wait_by_resource.append({'resource': 'Non-GPU', 'median_wait_time': nongpujobs_df['wait_time'].median()})
 
     fig, ax = plt.subplots()
     n, bins, patchs = plt.hist(nongpujobs_df['wait_time'].dt.total_seconds(), bins=100,
@@ -264,6 +268,8 @@ def main():
     print(f"Min wait time = {gpujobs_df['wait_time'].min()}")
     print(f"Max wait time = {gpujobs_df['wait_time'].max()}")
     print()
+
+    wait_by_resource.append({'resource': 'Any GPU', 'median_wait_time': gpujobs_df['wait_time'].median()})
 
     fig, ax = plt.subplots()
     n, bins, patchs = plt.hist(gpujobs_df['wait_time'].dt.total_seconds(), bins=100,
@@ -289,6 +295,8 @@ def main():
             print(f"Max wait time = {gpugtjobs_df['wait_time'].max()}")
             print()
 
+            wait_by_resource.append({'resource': f'{gt.upper()} GPU', 'median_wait_time': gpugtjobs_df['wait_time'].median()})
+
             fig, ax = plt.subplots()
             n, bins, patchs = plt.hist(gpugtjobs_df['wait_time'].dt.total_seconds(),
                                        bins=100, log=False)
@@ -302,6 +310,9 @@ def main():
         else:
             print(f'INFO: no jobs requesting GPU type {gt}')
 
+    wait_by_resource_df = pd.DataFrame(wait_by_resource)
+    with open('wait_by_resource.html', 'w') as htmlfile:
+        htmlfile.write(wait_by_resource_df.to_html())
 
 if __name__ == '__main__':
     main()
