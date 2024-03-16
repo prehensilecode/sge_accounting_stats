@@ -312,7 +312,7 @@ def main():
 
     wait_by_resource_df = pd.DataFrame(wait_by_resource)
     with open('wait_by_resource.html', 'w') as htmlfile:
-        htmlfile.write(wait_by_resource_df.to_html())
+        htmlfile.write(wait_by_resource_df.to_html(index=False))
 
 if __name__ == '__main__':
     main()
