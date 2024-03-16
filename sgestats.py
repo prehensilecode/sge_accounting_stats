@@ -5,7 +5,9 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import re
+import pyarrow.feather as feather
 from pathlib import Path
+
 
 
 def memstr_to_mebibyte(memstr: str) -> float:
@@ -180,8 +182,9 @@ def main():
 
     sgeacct_df = prep_accounting(sgeacct_df)
 
-    # this is for debugging
+    # this is for human debugging
     sgeacct_df.to_csv('accounting_postprocessed.csv', sep=':', index=False)
+    feather.write_feather(sgeacct_df, 'accounting_postprocessed.feather')
 
     if debug_p:
         print(f"DEBUG: sgeacct_df.head() = \n{sgeacct_df.head()}")
