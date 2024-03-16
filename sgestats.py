@@ -268,45 +268,29 @@ def main():
     plt.savefig('wait_time_gpu.png')
     print()
 
-    print("Wait time for jobs requesting A100 GPU")
-    gpua100jobs_df = sgeacct_df[(sgeacct_df['gpu'] > 0) & (sgeacct_df['gpu_type'] == 'a100')]
-    print(f"No. of jobs requesting A100 GPUs: {len(gpua100jobs_df.index):.4e}")
-    print(f"Median wait time = {gpua100jobs_df['wait_time'].median()}")
-    print(f"Mean wait time = {gpua100jobs_df['wait_time'].mean()}")
-    print(f"Min wait time = {gpua100jobs_df['wait_time'].min()}")
-    print(f"Max wait time = {gpua100jobs_df['wait_time'].max()}")
-    print()
+    gpu_types = set(['p100', 'a40', 'a100', 'v100'])
+    gpugtjobs_df = None
+    for gt in gpu_types:
+        print(f"Wait time for jobs requesting {gt.upper()} GPU")
+        gpugtjobs_df = sgeacct_df[(sgeacct_df['gpu'] > 0) &
+                                  (sgeacct_df['gpu_type'] == gt)]
+        print(f"No. of jobs requesting {gt.upper()} GPUs: {len(gpugtjobs_df.index):.4e}")
+        print(f"Median wait time = {gpugtjobs_df['wait_time'].median()}")
+        print(f"Mean wait time = {gpugtjobs_df['wait_time'].mean()}")
+        print(f"Min wait time = {gpugtjobs_df['wait_time'].min()}")
+        print(f"Max wait time = {gpugtjobs_df['wait_time'].max()}")
+        print()
 
-    fig, ax = plt.subplots()
-    n, bins, patchs = plt.hist(gpua100jobs_df['wait_time'].dt.total_seconds(), bins=100,
-                               log=False)
-    ax.set_title('Histogram of wait time for CUBIC A100 GPU jobs (Jan 01, 2023 - present)')
-    ax.set_xlabel('Wait time (s)')
-    ax.set_ylabel('Frequency')
-    fig.tight_layout()
-    plt.savefig('wait_time_gpu.pdf')
-    plt.savefig('wait_time_gpu.png')
-    print()
-
-    print("Wait time for jobs requesting V100 GPU")
-    gpuv100jobs_df = sgeacct_df[(sgeacct_df['gpu'] > 0) & (sgeacct_df['gpu_type'] == 'v100')]
-    print(f"No. of jobs requesting V100 GPUs: {len(gpuv100jobs_df.index):.4e}")
-    print(f"Median wait time = {gpuv100jobs_df['wait_time'].median()}")
-    print(f"Mean wait time = {gpuv100jobs_df['wait_time'].mean()}")
-    print(f"Min wait time = {gpuv100jobs_df['wait_time'].min()}")
-    print(f"Max wait time = {gpuv100jobs_df['wait_time'].max()}")
-    print()
-
-    fig, ax = plt.subplots()
-    n, bins, patchs = plt.hist(gpuv100jobs_df['wait_time'].dt.total_seconds(), bins=100,
-                               log=False)
-    ax.set_title('Histogram of wait time for CUBIC V100 GPU jobs (Jan 01, 2023 - present)')
-    ax.set_xlabel('Wait time (s)')
-    ax.set_ylabel('Frequency')
-    fig.tight_layout()
-    plt.savefig('wait_time_gpu.pdf')
-    plt.savefig('wait_time_gpu.png')
-    print()
+        fig, ax = plt.subplots()
+        n, bins, patchs = plt.hist(gpugtjobs_df['wait_time'].dt.total_seconds(),
+                                   bins=100, log=False)
+        ax.set_title(f'Histogram of wait time for CUBIC {gt.upper()} GPU jobs (Jan 01, 2023 - present)')
+        ax.set_xlabel('Wait time (s)')
+        ax.set_ylabel('Frequency')
+        fig.tight_layout()
+        plt.savefig(f'wait_time_gpu_{gt}.pdf')
+        plt.savefig(f'wait_time_gpu_{gt}.png')
+        print()
 
 
 if __name__ == '__main__':
