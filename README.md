@@ -24,3 +24,8 @@ or submit to cluster:
 ```
 sbatch sgestats.sh
 ```
+
+### Note on use of Modin/Ray and Feather
+1. Modin parallelizes, and is noticeably faster
+2. Feather files are much faster to write and much smaller. Comparable JSON is about 4x larger, and much, much slower to read.
+

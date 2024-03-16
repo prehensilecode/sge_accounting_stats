@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys, os, datetime
-import pandas as pd
+import modin.pandas as pd
 import matplotlib
 import time
 

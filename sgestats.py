@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 import sys, os, datetime
-import pandas as pd
+import modin.pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import re
 import pyarrow.feather as feather
 from pathlib import Path
-
+from argparse import ArgumentParser
 
 
 def memstr_to_mebibyte(memstr: str) -> float:
@@ -106,7 +106,8 @@ def parse_categories(cat):
         retdict['gpu_type'] = None
     else:
         # gpu in retdict but gpu_type not specified
-        retdict['gpu_type'] = None
+        if 'gpu_type' not in retdict:
+            retdict['gpu_type'] = None
 
     if 'h_stack' not in retdict:
         retdict['h_stack'] = None
@@ -162,29 +163,38 @@ def prep_accounting(sgeacct_df):
 
 
 def main():
-    debug_p = False
+    parser = ArgumentParser()
+    parser.add_argument('-d', '--debug', action='store_true', help='debugging output')
+    args = parser.parse_args()
+
+    debug_p = args.debug
 
     pd.set_option('display.max_columns', None)
     pd.set_option('display.max_rows', None)
 
-    # read in pre-filtered data
-    sgeacct_df = pd.read_csv('accounting_shorter', sep=':')
+    acctpostproc = Path('accounting_postprocessed.feather')
+    if acctpostproc.is_file():
+        print(f'INFO: reading feather file {acctpostproc}')
+        sgeacct_df = pd.read_feather(acctpostproc)
+    else:
+        # read in pre-filtered data
+        sgeacct_df = pd.read_csv('accounting_shorter', sep=':')
 
-    # drop all rows where start_time is earlier than submission_time
-    bad_rows = sgeacct_df[sgeacct_df['start_time'] < sgeacct_df['submission_time']].index
-    sgeacct_df.drop(bad_rows, inplace=True)
+        # drop all rows where start_time is earlier than submission_time
+        bad_rows = sgeacct_df[sgeacct_df['start_time'] < sgeacct_df['submission_time']].index
+        sgeacct_df.drop(bad_rows, inplace=True)
 
-    sgeacct_df['submission_time'] = pd.to_datetime(sgeacct_df['submission_time'], unit='s')
-    sgeacct_df['start_time'] = pd.to_datetime(sgeacct_df['start_time'], unit='s')
-    sgeacct_df['end_time'] = pd.to_datetime(sgeacct_df['end_time'], unit='s')
+        sgeacct_df['submission_time'] = pd.to_datetime(sgeacct_df['submission_time'], unit='s')
+        sgeacct_df['start_time'] = pd.to_datetime(sgeacct_df['start_time'], unit='s')
+        sgeacct_df['end_time'] = pd.to_datetime(sgeacct_df['end_time'], unit='s')
 
-    sgeacct_df['wait_time'] = (sgeacct_df['start_time'] - sgeacct_df['submission_time'])
+        sgeacct_df['wait_time'] = (sgeacct_df['start_time'] - sgeacct_df['submission_time'])
 
-    sgeacct_df = prep_accounting(sgeacct_df)
+        sgeacct_df = prep_accounting(sgeacct_df)
 
-    # this is for human debugging
-    sgeacct_df.to_csv('accounting_postprocessed.csv', sep=':', index=False)
-    feather.write_feather(sgeacct_df, 'accounting_postprocessed.feather')
+        # CSV is for human debugging
+        #sgeacct_df.to_csv('accounting_postprocessed.csv', sep=':', index=False)
+        sgeacct_df.to_feather(acctpostproc)
 
     if debug_p:
         print(f"DEBUG: sgeacct_df.head() = \n{sgeacct_df.head()}")
@@ -200,7 +210,6 @@ def main():
     print(f"Stats for CUBIC from {sgeacct_df['submission_time'].iloc[0]} - {sgeacct_df['end_time'].iloc[-1]}")
     print(f"No. of jobs: {len(sgeacct_df.index):.4e}")
     print(f"Median wait time = {sgeacct_df['wait_time'].median()}")
-    print(f"Mean wait time = {sgeacct_df['wait_time'].mean()}")
     print(f"Min wait time = {sgeacct_df['wait_time'].min()}")
     print(f"Max wait time = {sgeacct_df['wait_time'].max()}")
     print()
@@ -233,7 +242,6 @@ def main():
 
     print(f"No. of jobs not requesting GPUs: {len(nongpujobs_df.index):.4e}")
     print(f"Median wait time = {nongpujobs_df['wait_time'].median()}")
-    print(f"Mean wait time = {nongpujobs_df['wait_time'].mean()}")
     print(f"Min wait time = {nongpujobs_df['wait_time'].min()}")
     print(f"Max wait time = {nongpujobs_df['wait_time'].max()}")
 
@@ -252,7 +260,6 @@ def main():
     gpujobs_df = sgeacct_df[sgeacct_df['gpu'] > 0]
     print(f"No. of jobs requesting GPUs of any type: {len(gpujobs_df.index):.4e}")
     print(f"Median wait time = {gpujobs_df['wait_time'].median()}")
-    print(f"Mean wait time = {gpujobs_df['wait_time'].mean()}")
     print(f"Min wait time = {gpujobs_df['wait_time'].min()}")
     print(f"Max wait time = {gpujobs_df['wait_time'].max()}")
     print()
@@ -272,25 +279,25 @@ def main():
     gpugtjobs_df = None
     for gt in gpu_types:
         print(f"Wait time for jobs requesting {gt.upper()} GPU")
-        gpugtjobs_df = sgeacct_df[(sgeacct_df['gpu'] > 0) &
-                                  (sgeacct_df['gpu_type'] == gt)]
+        gpugtjobs_df = sgeacct_df[sgeacct_df['gpu_type'] == gt]
         print(f"No. of jobs requesting {gt.upper()} GPUs: {len(gpugtjobs_df.index):.4e}")
-        print(f"Median wait time = {gpugtjobs_df['wait_time'].median()}")
-        print(f"Mean wait time = {gpugtjobs_df['wait_time'].mean()}")
-        print(f"Min wait time = {gpugtjobs_df['wait_time'].min()}")
-        print(f"Max wait time = {gpugtjobs_df['wait_time'].max()}")
-        print()
 
-        fig, ax = plt.subplots()
-        n, bins, patchs = plt.hist(gpugtjobs_df['wait_time'].dt.total_seconds(),
-                                   bins=100, log=False)
-        ax.set_title(f'Histogram of wait time for CUBIC {gt.upper()} GPU jobs (Jan 01, 2023 - present)')
-        ax.set_xlabel('Wait time (s)')
-        ax.set_ylabel('Frequency')
-        fig.tight_layout()
-        plt.savefig(f'wait_time_gpu_{gt}.pdf')
-        plt.savefig(f'wait_time_gpu_{gt}.png')
-        print()
+        if len(gpugtjobs_df.index) > 0:
+            print(f"Median wait time = {gpugtjobs_df['wait_time'].median()}")
+            print(f"Min wait time = {gpugtjobs_df['wait_time'].min()}")
+            print(f"Max wait time = {gpugtjobs_df['wait_time'].max()}")
+            print()
+
+            fig, ax = plt.subplots()
+            n, bins, patchs = plt.hist(gpugtjobs_df['wait_time'].dt.total_seconds(),
+                                       bins=100, log=False)
+            ax.set_title(f'Histogram of wait time for CUBIC {gt.upper()} GPU jobs (Jan 01, 2023 - present)')
+            ax.set_xlabel('Wait time (s)')
+            ax.set_ylabel('Frequency')
+            fig.tight_layout()
+            plt.savefig(f'wait_time_gpu_{gt}.pdf')
+            plt.savefig(f'wait_time_gpu_{gt}.png')
+            print()
 
 
 if __name__ == '__main__':
