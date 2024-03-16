@@ -230,6 +230,7 @@ def main():
     fig.tight_layout()
     plt.savefig('wait_time_all.pdf')
     plt.savefig('wait_time_all.png')
+    plt.clf()
     print()
 
 
@@ -298,6 +299,8 @@ def main():
             plt.savefig(f'wait_time_gpu_{gt}.pdf')
             plt.savefig(f'wait_time_gpu_{gt}.png')
             print()
+        else:
+            print(f'INFO: no jobs requesting GPU type {gt}')
 
 
 if __name__ == '__main__':
