@@ -162,6 +162,7 @@ cython_debug/
 *.csv
 *.json
 *.feather
+*.html
 accounting
 accounting_shorter
 accounting_postprocessed
