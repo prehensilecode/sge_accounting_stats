@@ -215,7 +215,7 @@ def main():
     print()
 
     wait_by_resource = []
-    wait_by_resource.append({'resource': 'Any', 'median_wait_time': sgeacct_df['wait_time'].median()})
+    wait_by_resource.append({'Resource': 'Any', 'Median wait time': sgeacct_df['wait_time'].median(), 'Total no. of GPUs': None})
 
     fig, ax = plt.subplots()
 
@@ -248,7 +248,7 @@ def main():
     print(f"Min wait time = {nongpujobs_df['wait_time'].min()}")
     print(f"Max wait time = {nongpujobs_df['wait_time'].max()}")
 
-    wait_by_resource.append({'resource': 'Non-GPU', 'median_wait_time': nongpujobs_df['wait_time'].median()})
+    wait_by_resource.append({'Resource': 'Non-GPU', 'Median wait time': nongpujobs_df['wait_time'].median(), 'Total no. of GPUs': None})
 
     fig, ax = plt.subplots()
     n, bins, patchs = plt.hist(nongpujobs_df['wait_time'].dt.total_seconds(), bins=100,
@@ -269,7 +269,7 @@ def main():
     print(f"Max wait time = {gpujobs_df['wait_time'].max()}")
     print()
 
-    wait_by_resource.append({'resource': 'Any GPU', 'median_wait_time': gpujobs_df['wait_time'].median()})
+    wait_by_resource.append({'Resource': 'Any GPU', 'Median wait time': gpujobs_df['wait_time'].median(), 'Total no. of GPUs': 122})
 
     fig, ax = plt.subplots()
     n, bins, patchs = plt.hist(gpujobs_df['wait_time'].dt.total_seconds(), bins=100,
@@ -283,6 +283,7 @@ def main():
     print()
 
     gpu_types = set(['p100', 'a40', 'a100', 'v100'])
+    ngpus_by_type = {'p100': 70, 'a40': 26, 'a100': 22, 'v100': 4}
     gpugtjobs_df = None
     for gt in gpu_types:
         print(f"Wait time for jobs requesting {gt.upper()} GPU")
@@ -295,7 +296,7 @@ def main():
             print(f"Max wait time = {gpugtjobs_df['wait_time'].max()}")
             print()
 
-            wait_by_resource.append({'resource': f'{gt.upper()} GPU', 'median_wait_time': gpugtjobs_df['wait_time'].median()})
+            wait_by_resource.append({'Resource': f'{gt.upper()} GPU', 'Median wait time': gpugtjobs_df['wait_time'].median(), 'Total no. of GPUs': ngpus_by_type[gt]})
 
             fig, ax = plt.subplots()
             n, bins, patchs = plt.hist(gpugtjobs_df['wait_time'].dt.total_seconds(),
