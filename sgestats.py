@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-import sys, os, datetime
-import modin.pandas as pd
-import matplotlib
-import matplotlib.pyplot as plt
-import numpy as np
+import sys
+import os
+import datetime
 import re
-import pyarrow.feather as feather
 from pathlib import Path
 from argparse import ArgumentParser
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 def memstr_to_mebibyte(memstr: str) -> float:
@@ -164,7 +164,8 @@ def prep_accounting(sgeacct_df):
 
 def main():
     parser = ArgumentParser()
-    parser.add_argument('-d', '--debug', action='store_true', help='debugging output')
+    parser.add_argument('-d', '--debug', action='store_true',
+                        help='debugging output')
     args = parser.parse_args()
 
     debug_p = args.debug
@@ -227,7 +228,7 @@ def main():
     # FIXME add vertical line at the mean
     #plt.axvline(x=sgeacct_df['wait_time'].dt.total_seconds().median()/sgeacct_df['wait_time'].dt.total_seconds().max(), linestyle='dashed', color='red')
 
-    ax.set_title('Histogram of wait time for CUBIC (Jan 01, 2023 - present)')
+    ax.set_title('Wait time for CUBIC (Jan 01, 2023 - present)')
     ax.set_xlabel('Wait time (s)')
     ax.set_ylabel('Frequency')
     fig.tight_layout()
@@ -253,7 +254,7 @@ def main():
     fig, ax = plt.subplots()
     n, bins, patchs = plt.hist(nongpujobs_df['wait_time'].dt.total_seconds(), bins=100,
                                log=False)
-    ax.set_title('Histogram of wait time for CUBIC non-GPU jobs (Jan 01, 2023 - present)')
+    ax.set_title('Wait time for CUBIC non-GPU jobs (Jan 01, 2023 - present)')
     ax.set_xlabel('Wait time (s)')
     ax.set_ylabel('Frequency')
     fig.tight_layout()
@@ -274,7 +275,7 @@ def main():
     fig, ax = plt.subplots()
     n, bins, patchs = plt.hist(gpujobs_df['wait_time'].dt.total_seconds(), bins=100,
                                log=False)
-    ax.set_title('Histogram of wait time for CUBIC GPU jobs (Jan 01, 2023 - present)')
+    ax.set_title('Wait time for CUBIC GPU jobs (Jan 01, 2023 - present)')
     ax.set_xlabel('Wait time (s)')
     ax.set_ylabel('Frequency')
     fig.tight_layout()
@@ -296,12 +297,13 @@ def main():
             print(f"Max wait time = {gpugtjobs_df['wait_time'].max()}")
             print()
 
-            wait_by_resource.append({'Resource': f'{gt.upper()} GPU', 'Median wait time': gpugtjobs_df['wait_time'].median(), 'Total no. of GPUs': ngpus_by_type[gt]})
+            wait_by_resource.append({'Resource': f'{gt.upper()} GPU',
+                                     'Median wait time': gpugtjobs_df['wait_time'].median(), 'Total no. of GPUs': ngpus_by_type[gt]})
 
             fig, ax = plt.subplots()
             n, bins, patchs = plt.hist(gpugtjobs_df['wait_time'].dt.total_seconds(),
                                        bins=100, log=False)
-            ax.set_title(f'Histogram of wait time for CUBIC {gt.upper()} GPU jobs (Jan 01, 2023 - present)')
+            ax.set_title(f'Wait time for CUBIC {gt.upper()} GPU jobs (Jan 01, 2023 - present)')
             ax.set_xlabel('Wait time (s)')
             ax.set_ylabel('Frequency')
             fig.tight_layout()
@@ -314,6 +316,7 @@ def main():
     wait_by_resource_df = pd.DataFrame(wait_by_resource)
     with open('wait_by_resource.html', 'w') as htmlfile:
         htmlfile.write(wait_by_resource_df.to_html(index=False))
+
 
 if __name__ == '__main__':
     main()
