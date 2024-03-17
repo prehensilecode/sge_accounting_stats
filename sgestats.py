@@ -8,6 +8,7 @@ from argparse import ArgumentParser
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 
 
 def memstr_to_mebibyte(memstr: str) -> float:
@@ -83,12 +84,8 @@ def parse_categories(cat):
                 retval = np.int64(val)
         elif key.lower() == 'sgx':
             retkey = key.lower()
-            if val.lower() == 'true':
-                retval = True
-            else:
-                retval = False
+            retval = bool(val.lower() == 'true')
         else:
-            #print(f'WARN: unhandled key {key}; val = {val}')
             retkey = None
             retval = None
 
@@ -130,7 +127,7 @@ def parse_categories(cat):
     return retdict
 
 
-def prep_accounting(sgeacct_df):
+def prep_accounting(sgeacct_df, debug_p: bool):
     debug_p = False
     info_p = False
     # expand the df with stuff from the "-l resources_list"
@@ -189,9 +186,9 @@ def main():
         sgeacct_df['start_time'] = pd.to_datetime(sgeacct_df['start_time'], unit='s')
         sgeacct_df['end_time'] = pd.to_datetime(sgeacct_df['end_time'], unit='s')
 
-        sgeacct_df['wait_time'] = (sgeacct_df['start_time'] - sgeacct_df['submission_time'])
+        sgeacct_df['wait_time'] = sgeacct_df['start_time'] - sgeacct_df['submission_time']
 
-        sgeacct_df = prep_accounting(sgeacct_df)
+        sgeacct_df = prep_accounting(sgeacct_df, debug_p)
 
         # CSV is for human debugging
         #sgeacct_df.to_csv('accounting_postprocessed.csv', sep=':', index=False)
@@ -220,8 +217,10 @@ def main():
 
     fig, ax = plt.subplots()
 
-    n, bins, patchs = plt.hist(sgeacct_df['wait_time'].dt.total_seconds(), bins=100,
-                               log=False)
+    #n, bins, patchs = plt.hist(sgeacct_df['wait_time'].dt.total_seconds(), bins=100,
+    #                           log=False)
+    sns.histplot(sgeacct_df['wait_time'].dt.total_seconds(), bins=100,
+                 log=False)
 
     #print(f"median at {float(sgeacct_df['wait_time'].dt.total_seconds().median()) / float(sgeacct_df['wait_time'].dt.total_seconds().max())}")
 
@@ -252,8 +251,8 @@ def main():
     wait_by_resource.append({'Resource': 'Non-GPU', 'Median wait time': nongpujobs_df['wait_time'].median(), 'Total no. of GPUs': None})
 
     fig, ax = plt.subplots()
-    n, bins, patchs = plt.hist(nongpujobs_df['wait_time'].dt.total_seconds(), bins=100,
-                               log=False)
+    sns.histplot(nongpujobs_df['wait_time'].dt.total_seconds(), bins=100,
+                 log=False)
     ax.set_title('Wait time for CUBIC non-GPU jobs (Jan 01, 2023 - present)')
     ax.set_xlabel('Wait time (s)')
     ax.set_ylabel('Frequency')
@@ -273,8 +272,8 @@ def main():
     wait_by_resource.append({'Resource': 'Any GPU', 'Median wait time': gpujobs_df['wait_time'].median(), 'Total no. of GPUs': 122})
 
     fig, ax = plt.subplots()
-    n, bins, patchs = plt.hist(gpujobs_df['wait_time'].dt.total_seconds(), bins=100,
-                               log=False)
+    sns.histplot(gpujobs_df['wait_time'].dt.total_seconds(), bins=100,
+                 log=False)
     ax.set_title('Wait time for CUBIC GPU jobs (Jan 01, 2023 - present)')
     ax.set_xlabel('Wait time (s)')
     ax.set_ylabel('Frequency')
@@ -301,8 +300,8 @@ def main():
                                      'Median wait time': gpugtjobs_df['wait_time'].median(), 'Total no. of GPUs': ngpus_by_type[gt]})
 
             fig, ax = plt.subplots()
-            n, bins, patchs = plt.hist(gpugtjobs_df['wait_time'].dt.total_seconds(),
-                                       bins=100, log=False)
+            sns.histplot(gpugtjobs_df['wait_time'].dt.total_seconds(),
+                         bins=100, log=False)
             ax.set_title(f'Wait time for CUBIC {gt.upper()} GPU jobs (Jan 01, 2023 - present)')
             ax.set_xlabel('Wait time (s)')
             ax.set_ylabel('Frequency')
