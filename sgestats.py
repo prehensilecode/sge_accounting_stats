@@ -9,6 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from tinyhtml import html, h, frag, raw
 
 
 def memstr_to_mebibyte(memstr: str) -> float:
