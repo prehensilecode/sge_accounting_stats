@@ -215,7 +215,12 @@ def main():
     print()
 
     wait_by_resource = []
-    wait_by_resource.append({'Resource': 'Any', 'Median wait time': sgeacct_df['wait_time'].median(), 'Total no. of GPUs': None})
+    wait_by_resource.append({
+        'Resource': 'Any',
+        'Median wait time': sgeacct_df['wait_time'].median(),
+        'Min. wait time': sgeacct_df['wait_time'].min(),
+        'Max. wait time': sgeacct_df['wait_time'].max(),
+        'Total no. of GPUs': None})
 
     fig, ax = plt.subplots()
 
@@ -251,9 +256,12 @@ def main():
     print(f"Min wait time = {nongpujobs_df['wait_time'].min()}")
     print(f"Max wait time = {nongpujobs_df['wait_time'].max()}")
 
-    wait_by_resource.append({'Resource': 'Non-GPU',
-                             'Median wait time': nongpujobs_df['wait_time'].median(),
-                             'Total no. of GPUs': None})
+    wait_by_resource.append({
+        'Resource': 'Non-GPU',
+        'Median wait time': nongpujobs_df['wait_time'].median(),
+        'Min. wait time': nongpujobs_df['wait_time'].min(),
+        'Max. wait time': nongpujobs_df['wait_time'].max(),
+        'Total no. of GPUs': None})
 
     fig, ax = plt.subplots()
     sns.histplot(nongpujobs_df['wait_time'].dt.total_seconds(), bins=100,
@@ -278,9 +286,12 @@ def main():
     # manual count of GPUs
     ngpus_by_type = {'p100': 70, 'a40': 26, 'a100': 22, 'v100': 4}
     tot_gpus = sum(ngpus_by_type.values())
-    wait_by_resource.append({'Resource': 'Any GPU',
-                             'Median wait time': gpujobs_df['wait_time'].median(),
-                             'Total no. of GPUs': tot_gpus})
+    wait_by_resource.append({
+        'Resource': 'Any GPU',
+        'Median wait time': gpujobs_df['wait_time'].median(),
+        'Min. wait time': gpujobs_df['wait_time'].min(),
+        'Max. wait time': gpujobs_df['wait_time'].max(),
+        'Total no. of GPUs': tot_gpus})
 
     fig, ax = plt.subplots()
     sns.histplot(gpujobs_df['wait_time'].dt.total_seconds(), bins=100,
@@ -307,9 +318,12 @@ def main():
             print(f"Max wait time = {gpugtjobs_df['wait_time'].max()}")
             print()
 
-            wait_by_resource.append({'Resource': f'{gt.upper()} GPU',
-                                     'Median wait time': gpugtjobs_df['wait_time'].median(),
-                                     'Total no. of GPUs': ngpus_by_type[gt]})
+            wait_by_resource.append({
+                'Resource': f'{gt.upper()} GPU',
+                'Median wait time': gpugtjobs_df['wait_time'].median(),
+                'Min. wait time': gpugtjobs_df['wait_time'].min(),
+                'Max. wait time': gpugtjobs_df['wait_time'].max(),
+                'Total no. of GPUs': ngpus_by_type[gt]})
 
             fig, ax = plt.subplots()
             sns.histplot(gpugtjobs_df['wait_time'].dt.total_seconds(),
