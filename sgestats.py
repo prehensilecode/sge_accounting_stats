@@ -207,7 +207,7 @@ def main():
     print()
 
     print(f"Stats for CUBIC from {sgeacct_df['submission_time'].iloc[0]} - {sgeacct_df['end_time'].iloc[-1]}")
-    print("- - - - - - - - - - - - - - - - - - - -")
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
     print(f"No. of jobs: {len(sgeacct_df.index):.4e}")
     print(f"Median wait time = {sgeacct_df['wait_time'].median()}")
     print(f"Min wait time = {sgeacct_df['wait_time'].min()}")
@@ -297,6 +297,7 @@ def main():
     gpugtjobs_df = None
     for gt in gpu_types:
         print(f"Wait time for jobs requesting {gt.upper()} GPU")
+        print("- - - - - - - - - - - - - - - - - - - -")
         gpugtjobs_df = sgeacct_df[sgeacct_df['gpu_type'] == gt]
         print(f"No. of jobs requesting {gt.upper()} GPUs: {len(gpugtjobs_df.index):.4e}")
 
