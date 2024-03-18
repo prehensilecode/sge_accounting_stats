@@ -27,6 +27,9 @@ sgeacct_df = sgeacct_df[sgeacct_df['submission_time'] > timestamp]
 #timestamp = time.mktime(time.strptime('2024-01-01 00:00:00', '%Y-%m-%d %H:%M:%S'))
 #sgeacct_df = sgeacct_df[sgeacct_df['submission_time'] < timestamp]
 
+# keep rows where owner != "accounting" (i.e. drop the accounting jobs)
+sgeacct_df = sgeacct_df[sgeacct_df['owner'] != 'accounting']
+
 # selective
 # category includes the qsub commandline, including various complex requests
 wanted_cols = ['qname', 'hostname', 'owner', 'job_number', 'submission_time',
