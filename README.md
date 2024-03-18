@@ -31,3 +31,4 @@ sbatch sgestats.sh
 
 Using standard Pandas and doing i/o to CSV files, the `sgestats.py` job runs in about 3.5 to 4 minutes, having to munge the `category` column into their own columns. Using the Feather file, and Modin with Ray, the job runs in about 45 seconds.
 
+N.B. was unable to pip install `modin[ray]` on Ubuntu 23.10 using Homebrew-installed Python 3.12.2
