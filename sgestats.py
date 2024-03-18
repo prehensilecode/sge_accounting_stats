@@ -338,6 +338,15 @@ def main():
         else:
             print(f'INFO: no jobs requesting GPU type {gt}')
 
+    # by h_vmem request
+    wt_vs_vmem_df = sgeacct_df[['h_vmem', 'wait_time']].sort_values(by=['h_vmem'])
+    fig, ax = plt.subplots()
+    sns.relplot(data=wt_vs_vmem_df, x='h_vmem', y='wait_time')
+    ax.set_xlabel('h_vmem request (MiB)')
+    ax.set_ylabel('Wait time (s)')
+    plt.savefig('wait_time_vs_h_vmem.png')
+    plt.savefig('wait_time_vs_h_vmem.pdf')
+
     wait_by_resource_df = pd.DataFrame(wait_by_resource)
     with open('wait_by_resource.html', 'w') as htmlfile:
         htmlfile.write(wait_by_resource_df.to_html(index=False))
