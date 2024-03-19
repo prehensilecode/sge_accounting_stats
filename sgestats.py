@@ -382,6 +382,7 @@ def main():
 
     # wait time vs month-year; group by month start
     wt_vs_mthyr_df = sgeacct_df.loc[:, ['submission_time', 'wait_time']].groupby(pd.Grouper(key='submission_time', freq='MS'))['wait_time'].median().reset_index()
+    wt_vs_mthyr_df.rename(columns={'wait_time': 'median_wait_time'}, inplace=True)
     print(f'wt_vs_mthyr_df.describe() = \n{wt_vs_mthyr_df.describe()}\n\n')
 
     with open('wait_by_month.html', 'w') as htmlfile:
