@@ -343,7 +343,7 @@ def main():
         htmlfile.write(wait_by_resource_df.to_html(index=False))
 
     # by h_vmem request
-    wt_vs_vmem_df = sgeacct_df.loc[:, ('h_vmem', 'wait_time')].groupby(by='h_vmem', as_index=False)[['wait_time']].median()
+    wt_vs_vmem_df = sgeacct_df.loc[:, ('h_vmem', 'wait_time')]
     wt_vs_vmem_df.dropna(inplace=True)
     print(f'wt_vs_vmem_df.describe() = \n{wt_vs_vmem_df.describe()}')
     print(f'wt_vs_vmem_df.head() = \n{wt_vs_vmem_df.head()}')
@@ -353,8 +353,8 @@ def main():
 
     fig, ax = plt.subplots()
     sns.scatterplot(data=wt_vs_vmem_df, x='h_vmem', y='wait_time')
-    plt.xscale('log')
-    plt.yscale('log')
+    #plt.xscale('log')
+    #plt.yscale('log')
     ax.set_xlabel('h_vmem request (MiB)')
     ax.set_ylabel('Wait time (s)')
     plt.savefig('wait_time_vs_h_vmem.png')
