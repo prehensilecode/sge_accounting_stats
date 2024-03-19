@@ -5,6 +5,7 @@ import datetime
 import re
 from pathlib import Path
 from argparse import ArgumentParser
+# modin does not work here due to certain df functions
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
