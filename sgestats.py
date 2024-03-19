@@ -341,7 +341,7 @@ def main():
 
     wait_by_resource_df = pd.DataFrame(wait_by_resource)
     with open('wait_by_resource.html', 'w') as htmlfile:
-        htmlfile.write(wait_by_resource_df.to_html(index=False))
+        htmlfile.write(wait_by_resource_df.to_html(index=False, justify='right'))
 
     # by h_vmem request
     wt_vs_vmem_df = sgeacct_df.loc[:, ('h_vmem', 'wait_time')]
@@ -386,7 +386,7 @@ def main():
     print(f'wt_vs_mthyr_df.describe() = \n{wt_vs_mthyr_df.describe()}\n\n')
 
     with open('wait_by_month.html', 'w') as htmlfile:
-        htmlfile.write(wt_vs_mthyr_df.to_html(index=False))
+        htmlfile.write(wt_vs_mthyr_df.to_html(index=False, justify='right'))
 
 
 if __name__ == '__main__':
