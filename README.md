@@ -26,7 +26,8 @@ sbatch sgestats.sh
 ```
 
 ### Note on use of Modin/Ray and Feather
-- Modin parallelizes, and is noticeably faster
+- Modin parallelizes, and is noticeably faster.
+  - However, it is does not provide 100% of Pandas features, and `sgestats.py` uses some Pandas functionality not found in Modin.
 - Feather files are much faster to write and much smaller. Comparable JSON is about 4x larger, and much, much slower to read.
 
 Using standard Pandas and doing i/o to CSV files, the `sgestats.py` job runs in about 3.5 to 4 minutes, having to munge the `category` column into their own columns. Using the Feather file, and Modin with Ray, the job runs in about 45 seconds.
