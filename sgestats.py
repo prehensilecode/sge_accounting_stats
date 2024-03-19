@@ -338,19 +338,46 @@ def main():
         else:
             print(f'INFO: no jobs requesting GPU type {gt}')
 
+    wait_by_resource_df = pd.DataFrame(wait_by_resource)
+    with open('wait_by_resource.html', 'w') as htmlfile:
+        htmlfile.write(wait_by_resource_df.to_html(index=False))
+
     # by h_vmem request
-    wt_vs_vmem_df = sgeacct_df[['h_vmem', 'wait_time']].sort_values(by=['h_vmem'])
+    wt_vs_vmem_df = sgeacct_df.loc[:, ('h_vmem', 'wait_time')].groupby(by='h_vmem', as_index=False)[['wait_time']].median()
+    wt_vs_vmem_df.dropna(inplace=True)
+    print(f'wt_vs_vmem_df.describe() = \n{wt_vs_vmem_df.describe()}')
+    print(f'wt_vs_vmem_df.head() = \n{wt_vs_vmem_df.head()}')
+
+    # Seaborn can't deal with pandas Timedelta values; convert to float secs
+    wt_vs_vmem_df['wait_time'] = wt_vs_vmem_df['wait_time'].apply(pd.Timedelta.total_seconds)
+
     fig, ax = plt.subplots()
-    sns.relplot(data=wt_vs_vmem_df, x='h_vmem', y='wait_time')
+    sns.scatterplot(data=wt_vs_vmem_df, x='h_vmem', y='wait_time')
+    plt.xscale('log')
+    plt.yscale('log')
     ax.set_xlabel('h_vmem request (MiB)')
     ax.set_ylabel('Wait time (s)')
     plt.savefig('wait_time_vs_h_vmem.png')
     plt.savefig('wait_time_vs_h_vmem.pdf')
 
-    wait_by_resource_df = pd.DataFrame(wait_by_resource)
-    with open('wait_by_resource.html', 'w') as htmlfile:
-        htmlfile.write(wait_by_resource_df.to_html(index=False))
+    # by no. of cores
+    wt_vs_slots_df = sgeacct_df.loc[:, ('slots', 'wait_time')]
+    wt_vs_slots_df.dropna(inplace=True)
+    print(f'wt_vs_slots_df.describe() = \n{wt_vs_slots_df.describe()}')
+    print(f'wt_vs_slots_df.head() = \n{wt_vs_slots_df.head()}')
+    print(f'wt_vs_slots_df.tail() = \n{wt_vs_slots_df.tail()}')
 
+    # Seaborn can't deal with pandas Timedelta values; convert to float secs
+    wt_vs_slots_df['wait_time'] = wt_vs_slots_df['wait_time'].apply(pd.Timedelta.total_seconds)
+
+    fig, ax = plt.subplots()
+    sns.scatterplot(data=wt_vs_slots_df, x='slots', y='wait_time')
+    #plt.xscale('log')
+    #plt.yscale('log')
+    ax.set_xlabel('No. of slots requested')
+    ax.set_ylabel('Wait time (s)')
+    plt.savefig('wait_time_vs_slots.png')
+    plt.savefig('wait_time_vs_slots.pdf')
 
 if __name__ == '__main__':
     main()
