@@ -52,12 +52,9 @@ def main():
     print(usagebyuser_df.describe())
     print()
     print('Head:')
-    print(usagebyuser_df.head(50))
+    print(usagebyuser_df.head(10))
     with open('top50users.html', 'w') as htmlfile:
         htmlfile.write(usagebyuser_df.to_html(index=False, justify='right'))
-
-
-
 
 
 if __name__ == '__main__':
