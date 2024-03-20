@@ -22,7 +22,9 @@ def main():
     # want entries for the last 180 days
     now = datetime.datetime.now()
     sixmonths = now - datetime.timedelta(days=(6 * 30))
-    print(f'DEBUG: sixmonths = {sixmonths}')
+
+    if debug_p:
+        print(f'DEBUG: sixmonths = {sixmonths}')
 
     # drop project pseudo users (manual list for now)
     users_to_drop = set(['niagads', 'nbthetaconn', 'rbc', 'pennlincqsm',
@@ -45,15 +47,36 @@ def main():
     sgeacct_df = sgeacct_df[~sgeacct_df['owner'].isin(users_to_drop)]
 
     lastsixmonths_df = sgeacct_df[sgeacct_df['start_time'] >= sixmonths]
+
+    lastsixmonths_df = lastsixmonths_df[['owner', 'job_number', 'submission_time', 'start_time', 'end_time', 'ru_wallclock', 'failed', 'slots', 'cpu']]
+
+    # debug
+    if debug_p:
+        print('DEBUG')
+        print(f'lastsixmonths_df.head() = \n{lastsixmonths_df.head()}\n\n')
+
+        print('DEBUG - owner == chiahs')
+        print('DEBUG - owner == chiahs - describe')
+        print(lastsixmonths_df[lastsixmonths_df['owner'] == 'chiahs'].describe())
+        print('- - - - - - - - - - - - -')
+        print('DEBUG - owner == chiahs - head')
+        print(lastsixmonths_df[lastsixmonths_df['owner'] == 'chiahs'].head())
+        print('- - - - - - - - - - - - -')
+        print()
+
     usagebyuser_df = lastsixmonths_df.loc[:, ['owner', 'cpu']].groupby('owner').sum(numeric_only=True).sort_values(by='cpu', ascending=False).apply(pd.to_timedelta, unit='s').reset_index()
 
-    print()
-    print('Describe:')
-    print(usagebyuser_df.describe())
-    print()
-    print('Head:')
-    print(usagebyuser_df.head(10))
-    with open('top50users.html', 'w') as htmlfile:
+    usagebyuser_df.rename(columns={'owner': 'Job owner', 'cpu': 'CPU usage (core-time)'}, inplace=True)
+
+    if debug_p:
+        print()
+        print('Describe:')
+        print(usagebyuser_df.describe())
+        print()
+        print('Head:')
+        print(usagebyuser_df.head(10))
+
+    with open('top10users.html', 'w') as htmlfile:
         htmlfile.write(usagebyuser_df.to_html(index=False, justify='right'))
 
 
