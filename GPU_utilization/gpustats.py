@@ -8,6 +8,9 @@ gpustats_df.describe()
 gpustats_df.loc[gpustats_df['GPU type'] == 'Tesla P100-PCIE-12GB', 'GPU type'] = 'P100'
 gpustats_df.loc[gpustats_df['GPU type'] == 'Tesla V100-PCIE-16GB', 'GPU type'] = 'V100'
 
+# remove IDLE rows
+gpustats_df = gpustats_df[gpustats_df['user'] != 'IDLE']
+
 bygputype_df = gpustats_df[['GPU type', 'memUsed (MiB)', 'memory percentage used']].groupby('GPU type')
 
 bygputype_df.describe()
