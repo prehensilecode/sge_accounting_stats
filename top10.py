@@ -65,6 +65,9 @@ def main():
     print()
     print('Head:')
     print(usagebyuser_df.head(50))
+    with open('top50users.html', 'w') as htmlfile:
+        htmlfile.write(usagebyuser_df.to_html(index=False, justify='right'))
+
 
 
 
