@@ -13,4 +13,7 @@ gpustats_df = gpustats_df[gpustats_df['user'] != 'IDLE']
 
 bygputype_df = gpustats_df[['GPU type', 'memUsed (MiB)', 'memory percentage used']].groupby('GPU type')
 
-bygputype_df.describe()
+print(bygputype_df.describe())
+
+with open('gpustats.html', 'w') as htmlfile:
+    htmlfile.write(bygputype_df.describe().to_html(index=True, justify='right'))
