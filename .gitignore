@@ -166,6 +166,7 @@ cython_debug/
 accounting
 accounting_shorter
 accounting_postprocessed
+accounting_test_cubic
 *.pdf
 *.png
 
