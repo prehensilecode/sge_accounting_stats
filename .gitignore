@@ -172,3 +172,6 @@ accounting_test_cubic
 
 # slurm output files
 *.out
+
+# jupyter stuff
+.virtual_documents/
